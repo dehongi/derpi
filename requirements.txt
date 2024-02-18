@@ -1,5 +1,7 @@
 asgiref==3.7.2
 Django==5.0.2
 django-cleanup==8.1.0
+django-jalali-date==1.1.0
+jdatetime==4.1.1
 pillow==10.2.0
 sqlparse==0.4.4
