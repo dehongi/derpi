@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "jalali_date",
     # Local
     "accounts.apps.AccountsConfig",
+    "website.apps.WebsiteConfig",
     # django-cleanup
     "django_cleanup.apps.CleanupConfig",
 ]
@@ -62,7 +63,7 @@ ROOT_URLCONF = "derpi.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
