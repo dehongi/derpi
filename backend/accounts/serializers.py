@@ -9,7 +9,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password')
+        fields = ('id', 'username', 'email', 'password', 'active_company')
+        read_only_fields = ('active_company',)
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -32,5 +33,6 @@ class LoginSerializer(serializers.Serializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name')
-        read_only_fields = ('username',)
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'active_company')
+        read_only_fields = ('username', 'active_company')
+

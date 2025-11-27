@@ -27,6 +27,11 @@ export default function DashboardLayout({
                             </a>
                         </li>
                         <li>
+                            <a href="/dashboard/contacts" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded">
+                                مخاطبین
+                            </a>
+                        </li>
+                        <li>
                             <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded">
                                 تنظیمات
                             </a>
