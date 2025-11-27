@@ -40,9 +40,20 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    # Core apps
     'accounts',
     'companies',
     'contacts',
+    # ERP apps
+    'inventory',
+    'sales',
+    'procurement',
+    'pos',
+    'hr',
+    'crm',
+    'accounting',
+    'ecommerce',
+    'website',
 ]
 
 REST_FRAMEWORK = {
