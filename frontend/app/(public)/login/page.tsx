@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import api from "@/utils/api";
+import Cookies from "js-cookie";
 
 export default function LoginPage() {
     const [username, setUsername] = useState("");
@@ -10,10 +12,14 @@ export default function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: Implement actual login logic with backend API
-        console.log("Login attempt", { username, password });
-        // Simulate success
-        router.push("/dashboard");
+        try {
+            const response = await api.post('/accounts/login/', { username, password });
+            Cookies.set('token', response.data.token);
+            router.push("/dashboard");
+        } catch (error) {
+            console.error("Login failed", error);
+            alert("نام کاربری یا رمز عبور اشتباه است");
+        }
     };
 
     return (
@@ -26,7 +32,7 @@ export default function LoginPage() {
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                         required
                     />
                 </div>
@@ -36,7 +42,7 @@ export default function LoginPage() {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                         required
                     />
                 </div>

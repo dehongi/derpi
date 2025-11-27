@@ -17,8 +17,13 @@ export default function DashboardLayout({
                             </a>
                         </li>
                         <li>
-                            <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded">
-                                کاربران
+                            <a href="/dashboard/profile" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded">
+                                پروفایل کاربری
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/dashboard/company" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded">
+                                اطلاعات شرکت
                             </a>
                         </li>
                         <li>

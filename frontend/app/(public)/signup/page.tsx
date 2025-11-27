@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import api from "@/utils/api";
 
 export default function SignupPage() {
     const [username, setUsername] = useState("");
@@ -11,10 +12,13 @@ export default function SignupPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: Implement actual signup logic with backend API
-        console.log("Signup attempt", { username, email, password });
-        // Simulate success
-        router.push("/login");
+        try {
+            await api.post('/accounts/signup/', { username, email, password });
+            router.push("/login");
+        } catch (error) {
+            console.error("Signup failed", error);
+            alert("ثبت نام با خطا مواجه شد");
+        }
     };
 
     return (
@@ -27,7 +31,7 @@ export default function SignupPage() {
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                         required
                     />
                 </div>
@@ -37,7 +41,7 @@ export default function SignupPage() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                         required
                     />
                 </div>
@@ -47,7 +51,7 @@ export default function SignupPage() {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                         required
                     />
                 </div>

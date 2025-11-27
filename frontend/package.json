@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@types/js-cookie": "^3.0.6",
+    "axios": "^1.13.2",
+    "js-cookie": "^3.0.5",
     "next": "16.0.5",
     "react": "19.2.0",
     "react-dom": "19.2.0"
