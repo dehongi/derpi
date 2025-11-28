@@ -3,31 +3,47 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
-import api from '@/utils/api';
+import { getPayment, updatePayment, deletePayment, getInvoices } from '@/lib/api/sales';
 
 export default function EditPaymentPage() {
     const router = useRouter();
     const params = useParams();
     const id = params.id;
-    
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [formData, setFormData] = useState<any>({});
+
+    const [invoices, setInvoices] = useState<any[]>([]);
+
+    const [formData, setFormData] = useState<any>({
+        payment_number: '',
+        invoice: '',
+        date: '',
+        amount: 0,
+        payment_method: 'cash',
+        reference: '',
+        notes: '',
+    });
 
     useEffect(() => {
         if (id) {
-            fetchItem();
+            fetchData();
         }
     }, [id]);
 
-    const fetchItem = async () => {
+    const fetchData = async () => {
         try {
-            const response = await api.get(`/sales/payments/${id}/`);
-            setFormData(response.data);
+            const [paymentRes, invoicesRes] = await Promise.all([
+                getPayment(id as string),
+                getInvoices()
+            ]);
+
+            setFormData(paymentRes.data);
+            setInvoices(invoicesRes.data);
         } catch (error) {
-            console.error('Error fetching item:', error);
+            console.error('Error fetching data:', error);
             setError('خطا در بارگذاری اطلاعات');
         } finally {
             setLoading(false);
@@ -35,11 +51,8 @@ export default function EditPaymentPage() {
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-        setFormData((prev: any) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-        }));
+        const { name, value } = e.target;
+        setFormData((prev: any) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -49,12 +62,13 @@ export default function EditPaymentPage() {
         setSuccess('');
 
         try {
-            await api.put(`/sales/payments/${id}/`, formData);
+            await updatePayment(id as string, formData);
             setSuccess('تغییرات با موفقیت ذخیره شد');
             setTimeout(() => {
                 router.push('/dashboard/sales/payments');
             }, 1500);
         } catch (err: any) {
+            console.error(err);
             setError(err.response?.data?.detail || 'خطا در ذخیره تغییرات');
         } finally {
             setSaving(false);
@@ -62,12 +76,12 @@ export default function EditPaymentPage() {
     };
 
     const handleDelete = async () => {
-        if (confirm('آیا از حذف این مورد اطمینان دارید؟')) {
+        if (confirm('آیا از حذف این پرداخت اطمینان دارید؟')) {
             try {
-                await api.delete(`/sales/payments/${id}/`);
+                await deletePayment(id as string);
                 router.push('/dashboard/sales/payments');
             } catch (error) {
-                console.error('Error deleting item:', error);
+                console.error('Error deleting payment:', error);
                 alert('خطا در حذف');
             }
         }
@@ -81,11 +95,13 @@ export default function EditPaymentPage() {
         );
     }
 
+    const selectedInvoice = invoices.find(inv => inv.id === parseInt(formData.invoice));
+
     return (
         <div>
             <PageHeader
-                title="ویرایش"
-                subtitle="ویرایش اطلاعات"
+                title="ویرایش پرداخت"
+                subtitle={`ویرایش پرداخت ${formData.payment_number}`}
             />
 
             {error && (
@@ -101,11 +117,106 @@ export default function EditPaymentPage() {
             )}
 
             <form onSubmit={handleSubmit} className="bg-white rounded shadow p-6">
-                <div className="text-gray-500 text-center py-8">
-                    فرم ویرایش - فیلدها باید بر اساس مدل تکمیل شوند
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">شماره پرداخت</label>
+                        <input
+                            type="text"
+                            name="payment_number"
+                            value={formData.payment_number}
+                            onChange={handleChange}
+                            className="w-full border rounded px-3 py-2"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">فاکتور</label>
+                        <select
+                            name="invoice"
+                            value={formData.invoice}
+                            onChange={handleChange}
+                            className="w-full border rounded px-3 py-2"
+                            required
+                        >
+                            <option value="">انتخاب فاکتور...</option>
+                            {invoices.map(inv => (
+                                <option key={inv.id} value={inv.id}>
+                                    {inv.invoice_number} - {inv.total?.toLocaleString()} ریال
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">تاریخ</label>
+                        <input
+                            type="date"
+                            name="date"
+                            value={formData.date}
+                            onChange={handleChange}
+                            className="w-full border rounded px-3 py-2"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">مبلغ</label>
+                        <input
+                            type="number"
+                            name="amount"
+                            value={formData.amount}
+                            onChange={handleChange}
+                            className="w-full border rounded px-3 py-2"
+                            required
+                            min="0"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">روش پرداخت</label>
+                        <select
+                            name="payment_method"
+                            value={formData.payment_method}
+                            onChange={handleChange}
+                            className="w-full border rounded px-3 py-2"
+                        >
+                            <option value="cash">نقدی</option>
+                            <option value="card">کارت</option>
+                            <option value="transfer">انتقال بانکی</option>
+                            <option value="cheque">چک</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">مرجع (شماره تراکنش، شماره چک، ...)</label>
+                        <input
+                            type="text"
+                            name="reference"
+                            value={formData.reference || ''}
+                            onChange={handleChange}
+                            className="w-full border rounded px-3 py-2"
+                        />
+                    </div>
                 </div>
 
-                <div className="mt-6 flex gap-4">
+                {selectedInvoice && (
+                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
+                        <h3 className="font-medium mb-2">اطلاعات فاکتور</h3>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>جمع کل فاکتور: <span className="font-medium">{selectedInvoice.total?.toLocaleString()}</span> ریال</div>
+                            <div>پرداخت شده: <span className="font-medium">{selectedInvoice.paid_amount?.toLocaleString()}</span> ریال</div>
+                            <div>مانده: <span className="font-medium text-red-600">{(selectedInvoice.total - selectedInvoice.paid_amount)?.toLocaleString()}</span> ریال</div>
+                        </div>
+                    </div>
+                )}
+
+                <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">یادداشت‌ها</label>
+                    <textarea
+                        name="notes"
+                        value={formData.notes || ''}
+                        onChange={handleChange}
+                        className="w-full border rounded px-3 py-2 h-24"
+                    />
+                </div>
+
+                <div className="flex gap-4">
                     <button
                         type="submit"
                         disabled={saving}
