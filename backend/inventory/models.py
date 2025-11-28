@@ -49,6 +49,7 @@ class Item(models.Model):
     min_stock = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='حداقل موجودی')
     max_stock = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='حداکثر موجودی')
     cost = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name='قیمت تمام شده')
+    sale_price = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name='قیمت فروش')
     description = models.TextField(blank=True, null=True, verbose_name='توضیحات')
     is_active = models.BooleanField(default=True, verbose_name='فعال')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')

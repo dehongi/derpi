@@ -1,15 +1,12 @@
-from django.urls import path
-from .views import (
-    POSSaleListCreateView, POSSaleDetailView,
-    POSSaleItemListCreateView, POSSaleItemDetailView,
-    POSPaymentListCreateView, POSPaymentDetailView,
-)
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import POSSaleViewSet, POSSaleItemViewSet, POSPaymentViewSet
+
+router = DefaultRouter()
+router.register(r'sales', POSSaleViewSet, basename='pos-sale')
+router.register(r'sale-items', POSSaleItemViewSet, basename='pos-sale-item')
+router.register(r'payments', POSPaymentViewSet, basename='pos-payment')
 
 urlpatterns = [
-    path('p-o-s-sales/', POSSaleListCreateView.as_view(), name='p-o-s-sale-list-create'),
-    path('p-o-s-sales/<int:pk>/', POSSaleDetailView.as_view(), name='p-o-s-sale-detail'),
-    path('p-o-s-sale-items/', POSSaleItemListCreateView.as_view(), name='p-o-s-sale-item-list-create'),
-    path('p-o-s-sale-items/<int:pk>/', POSSaleItemDetailView.as_view(), name='p-o-s-sale-item-detail'),
-    path('p-o-s-payments/', POSPaymentListCreateView.as_view(), name='p-o-s-payment-list-create'),
-    path('p-o-s-payments/<int:pk>/', POSPaymentDetailView.as_view(), name='p-o-s-payment-detail'),
+    path('', include(router.urls)),
 ]
