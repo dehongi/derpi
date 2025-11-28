@@ -7,8 +7,8 @@ from .views import (
 )
 
 urlpatterns = [
-    path('categorys/', CategoryListCreateView.as_view(), name='category-list-create'),
-    path('categorys/<int:pk>/', CategoryDetailView.as_view(), name='category-detail'),
+    path('categories/', CategoryListCreateView.as_view(), name='category-list-create'),
+    path('categories/<int:pk>/', CategoryDetailView.as_view(), name='category-detail'),
     path('products/', ProductListCreateView.as_view(), name='product-list-create'),
     path('products/<int:pk>/', ProductDetailView.as_view(), name='product-detail'),
     path('orders/', OrderListCreateView.as_view(), name='order-list-create'),

@@ -42,13 +42,29 @@ export default function ProductsPage() {
         }
     };
 
-        const columns = [
-        { key: 'id', label: 'شناسه' },
+    const columns = [
+        {
+            key: 'images',
+            label: 'تصویر',
+            render: (value: any) => {
+                const img = Array.isArray(value) && value.length > 0 ? value[0] : value;
+                return img ? <img src={img} alt="" className="w-10 h-10 object-cover rounded" /> : <div className="w-10 h-10 bg-gray-200 rounded"></div>;
+            }
+        },
         { key: 'name', label: 'نام محصول' },
+        { key: 'category_name', label: 'دسته‌بندی' },
         { key: 'sku', label: 'کد محصول' },
-        { key: 'price', label: 'قیمت', render: (value: number) => value?.toLocaleString('fa-IR') + ' ریال' },
+        { key: 'price', label: 'قیمت', render: (value: number) => value ? parseInt(value.toString()).toLocaleString('fa-IR') + ' ریال' : '-' },
         { key: 'stock_quantity', label: 'موجودی' },
-        { key: 'is_active', label: 'وضعیت', render: (value: boolean) => <span className={`px-2 py-1 rounded text-xs ${value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{value ? 'فعال' : 'غیرفعال'}</span> }
+        {
+            key: 'is_active',
+            label: 'وضعیت',
+            render: (value: boolean) => (
+                <span className={`px-2 py-1 rounded text-xs ${value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    {value ? 'فعال' : 'غیرفعال'}
+                </span>
+            )
+        }
     ];
 
     return (
