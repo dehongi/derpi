@@ -16,4 +16,8 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+export const contactUs = async (data: { name: string; email: string; subject: string; message: string }) => {
+    return api.post('/website/messages/', data);
+};
+
 export default api;
