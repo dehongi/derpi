@@ -16,6 +16,20 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            // Clear token and redirect to login
+            Cookies.remove('token');
+            if (typeof window !== 'undefined') {
+                window.location.href = '/login';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export const contactUs = async (data: { name: string; email: string; subject: string; message: string }) => {
     return api.post('/website/messages/', data);
 };

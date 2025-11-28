@@ -251,6 +251,7 @@ body {
 /* Form Elements */
 input, textarea, select {
   transition: all var(--transition-base);
+  color: #111827; /* text-gray-900 */
 }
 
 input:focus, textarea:focus, select:focus {

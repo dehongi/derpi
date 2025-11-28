@@ -5,29 +5,62 @@ import { useRouter, useParams } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import api from '@/utils/api';
 
+import DataTable from '@/components/DataTable';
+
 export default function EditPurchaseOrderPage() {
     const router = useRouter();
     const params = useParams();
     const id = params.id;
-    
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [formData, setFormData] = useState<any>({});
+    const [formData, setFormData] = useState<any>({
+        po_number: '',
+        supplier: '',
+        date: '',
+        expected_delivery_date: '',
+        status: 'draft',
+        notes: '',
+        subtotal: 0,
+        tax: 0,
+        shipping: 0,
+        total: 0
+    });
+    const [suppliers, setSuppliers] = useState([]);
+    const [items, setItems] = useState([]);
+    const [inventoryItems, setInventoryItems] = useState<any[]>([]);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newItem, setNewItem] = useState({
+        item: '',
+        quantity: 1,
+        unit_price: 0,
+        total: 0
+    });
 
     useEffect(() => {
         if (id) {
-            fetchItem();
+            fetchData();
         }
     }, [id]);
 
-    const fetchItem = async () => {
+    const fetchData = async () => {
         try {
-            const response = await api.get(`/procurement/purchase-orders/${id}/`);
-            setFormData(response.data);
+            const [poRes, suppliersRes, itemsRes, invItemsRes] = await Promise.all([
+                api.get(`/procurement/purchase-orders/${id}/`),
+                api.get('/procurement/suppliers/'),
+                api.get('/procurement/purchase-order-items/'),
+                api.get('/inventory/items/')
+            ]);
+
+            setFormData(poRes.data);
+            setSuppliers(suppliersRes.data);
+            // Filter items for this PO
+            setItems(itemsRes.data.filter((item: any) => item.purchase_order === parseInt(id as string)));
+            setInventoryItems(invItemsRes.data);
         } catch (error) {
-            console.error('Error fetching item:', error);
+            console.error('Error fetching data:', error);
             setError('خطا در بارگذاری اطلاعات');
         } finally {
             setLoading(false);
@@ -35,11 +68,18 @@ export default function EditPurchaseOrderPage() {
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-        setFormData((prev: any) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-        }));
+        const { name, value } = e.target;
+        setFormData((prev: any) => {
+            const updated = { ...prev, [name]: value };
+            // Recalculate total if tax or shipping changes
+            if (name === 'tax' || name === 'shipping' || name === 'subtotal') {
+                const subtotal = parseFloat(updated.subtotal) || 0;
+                const tax = parseFloat(updated.tax) || 0;
+                const shipping = parseFloat(updated.shipping) || 0;
+                updated.total = subtotal + tax + shipping;
+            }
+            return updated;
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -51,9 +91,7 @@ export default function EditPurchaseOrderPage() {
         try {
             await api.put(`/procurement/purchase-orders/${id}/`, formData);
             setSuccess('تغییرات با موفقیت ذخیره شد');
-            setTimeout(() => {
-                router.push('/dashboard/procurement/purchase-orders');
-            }, 1500);
+            setTimeout(() => setSuccess(''), 3000);
         } catch (err: any) {
             setError(err.response?.data?.detail || 'خطا در ذخیره تغییرات');
         } finally {
@@ -73,6 +111,77 @@ export default function EditPurchaseOrderPage() {
         }
     };
 
+    const handleAddItem = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const total = newItem.quantity * newItem.unit_price;
+            await api.post('/procurement/purchase-order-items/', {
+                ...newItem,
+                total,
+                purchase_order: id
+            });
+            setShowAddModal(false);
+            setNewItem({ item: '', quantity: 1, unit_price: 0, total: 0 });
+
+            // Refresh items and recalculate subtotal
+            const itemsRes = await api.get('/procurement/purchase-order-items/');
+            const poItems = itemsRes.data.filter((item: any) => item.purchase_order === parseInt(id as string));
+            setItems(poItems);
+
+            const newSubtotal = poItems.reduce((sum: number, item: any) => sum + parseFloat(item.total), 0);
+            setFormData((prev: any) => ({
+                ...prev,
+                subtotal: newSubtotal,
+                total: newSubtotal + (parseFloat(prev.tax) || 0) + (parseFloat(prev.shipping) || 0)
+            }));
+
+            // Save the new totals
+            await api.patch(`/procurement/purchase-orders/${id}/`, {
+                subtotal: newSubtotal,
+                total: newSubtotal + (parseFloat(formData.tax) || 0) + (parseFloat(formData.shipping) || 0)
+            });
+
+        } catch (error) {
+            console.error('Error adding item:', error);
+            alert('خطا در افزودن آیتم');
+        }
+    };
+
+    const handleDeleteItem = async (itemId: number) => {
+        if (confirm('آیا از حذف این آیتم اطمینان دارید؟')) {
+            try {
+                await api.delete(`/procurement/purchase-order-items/${itemId}/`);
+
+                // Refresh items and recalculate
+                const itemsRes = await api.get('/procurement/purchase-order-items/');
+                const poItems = itemsRes.data.filter((item: any) => item.purchase_order === parseInt(id as string));
+                setItems(poItems);
+
+                const newSubtotal = poItems.reduce((sum: number, item: any) => sum + parseFloat(item.total), 0);
+                setFormData((prev: any) => ({
+                    ...prev,
+                    subtotal: newSubtotal,
+                    total: newSubtotal + (parseFloat(prev.tax) || 0) + (parseFloat(prev.shipping) || 0)
+                }));
+
+                await api.patch(`/procurement/purchase-orders/${id}/`, {
+                    subtotal: newSubtotal,
+                    total: newSubtotal + (parseFloat(formData.tax) || 0) + (parseFloat(formData.shipping) || 0)
+                });
+
+            } catch (error) {
+                console.error('Error deleting item:', error);
+            }
+        }
+    };
+
+    const columns = [
+        { key: 'item', label: 'کالا', render: (value: any) => inventoryItems.find((i: any) => i.id === value)?.name || value },
+        { key: 'quantity', label: 'تعداد' },
+        { key: 'unit_price', label: 'قیمت واحد', render: (value: number) => value?.toLocaleString('fa-IR') },
+        { key: 'total', label: 'جمع', render: (value: number) => value?.toLocaleString('fa-IR') },
+    ];
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -84,8 +193,8 @@ export default function EditPurchaseOrderPage() {
     return (
         <div>
             <PageHeader
-                title="ویرایش"
-                subtitle="ویرایش اطلاعات"
+                title={`ویرایش سفارش خرید ${formData.po_number}`}
+                subtitle="ویرایش اطلاعات و آیتم‌ها"
             />
 
             {error && (
@@ -100,9 +209,154 @@ export default function EditPurchaseOrderPage() {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="bg-white rounded shadow p-6">
-                <div className="text-gray-500 text-center py-8">
-                    فرم ویرایش - فیلدها باید بر اساس مدل تکمیل شوند
+            <form onSubmit={handleSubmit} className="bg-white rounded shadow p-6 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            شماره سفارش
+                        </label>
+                        <input
+                            type="text"
+                            name="po_number"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.po_number}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            تامین‌کننده
+                        </label>
+                        <select
+                            name="supplier"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.supplier}
+                            onChange={handleChange}
+                        >
+                            <option value="">انتخاب کنید...</option>
+                            {suppliers.map((supplier: any) => (
+                                <option key={supplier.id} value={supplier.id}>
+                                    {supplier.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            تاریخ
+                        </label>
+                        <input
+                            type="date"
+                            name="date"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.date}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            تاریخ تحویل مورد انتظار
+                        </label>
+                        <input
+                            type="date"
+                            name="expected_delivery_date"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.expected_delivery_date || ''}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            وضعیت
+                        </label>
+                        <select
+                            name="status"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.status}
+                            onChange={handleChange}
+                        >
+                            <option value="draft">پیش‌نویس</option>
+                            <option value="sent">ارسال شده</option>
+                            <option value="confirmed">تایید شده</option>
+                            <option value="received">دریافت شده</option>
+                            <option value="cancelled">لغو شده</option>
+                        </select>
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            یادداشت‌ها
+                        </label>
+                        <textarea
+                            name="notes"
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.notes || ''}
+                            onChange={handleChange}
+                        />
+                    </div>
+                </div>
+
+                <div className="mt-6 border-t pt-6">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">اطلاعات مالی</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                جمع جزء
+                            </label>
+                            <input
+                                type="number"
+                                name="subtotal"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                                value={formData.subtotal}
+                                readOnly
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                مالیات
+                            </label>
+                            <input
+                                type="number"
+                                name="tax"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                                value={formData.tax}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                هزینه حمل
+                            </label>
+                            <input
+                                type="number"
+                                name="shipping"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                                value={formData.shipping}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                جمع کل
+                            </label>
+                            <input
+                                type="number"
+                                name="total"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-bold"
+                                value={formData.total}
+                                readOnly
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="mt-6 flex gap-4">
@@ -129,6 +383,93 @@ export default function EditPurchaseOrderPage() {
                     </button>
                 </div>
             </form>
+
+            <div className="bg-white rounded shadow p-6">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold">آیتم‌های سفارش</h3>
+                    <button
+                        onClick={() => setShowAddModal(true)}
+                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    >
+                        افزودن آیتم
+                    </button>
+                </div>
+
+                <DataTable
+                    columns={columns}
+                    data={items}
+                    onDelete={(item: any) => handleDeleteItem(item.id)}
+                />
+            </div>
+
+            {showAddModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                        <h3 className="text-lg font-bold mb-4">افزودن آیتم</h3>
+                        <form onSubmit={handleAddItem} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    کالا
+                                </label>
+                                <select
+                                    required
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    value={newItem.item}
+                                    onChange={(e) => setNewItem({ ...newItem, item: e.target.value })}
+                                >
+                                    <option value="">انتخاب کنید...</option>
+                                    {inventoryItems.map((item: any) => (
+                                        <option key={item.id} value={item.id}>
+                                            {item.name} (موجودی: {item.quantity})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    تعداد
+                                </label>
+                                <input
+                                    type="number"
+                                    required
+                                    min="1"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    value={newItem.quantity}
+                                    onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    قیمت واحد
+                                </label>
+                                <input
+                                    type="number"
+                                    required
+                                    min="0"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    value={newItem.unit_price}
+                                    onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) })}
+                                />
+                            </div>
+                            <div className="flex justify-end gap-2 mt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAddModal(false)}
+                                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md"
+                                >
+                                    انصراف
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 text-white bg-blue-600 rounded-md"
+                                >
+                                    افزودن
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

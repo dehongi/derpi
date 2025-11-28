@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import api from '@/utils/api';
@@ -10,8 +10,29 @@ export default function CreatePurchaseOrderPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    
-    const [formData, setFormData] = useState({});
+    const [suppliers, setSuppliers] = useState([]);
+
+    const [formData, setFormData] = useState({
+        po_number: '',
+        supplier: '',
+        date: new Date().toISOString().split('T')[0],
+        expected_delivery_date: '',
+        status: 'draft',
+        notes: ''
+    });
+
+    useEffect(() => {
+        fetchSuppliers();
+    }, []);
+
+    const fetchSuppliers = async () => {
+        try {
+            const response = await api.get('/procurement/suppliers/');
+            setSuppliers(response.data);
+        } catch (error) {
+            console.error('Error fetching suppliers:', error);
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -25,10 +46,11 @@ export default function CreatePurchaseOrderPage() {
         setSuccess('');
 
         try {
-            await api.post('/procurement/purchase-orders/', formData);
+            const response = await api.post('/procurement/purchase-orders/', formData);
             setSuccess('سفارش خرید با موفقیت ایجاد شد');
             setTimeout(() => {
-                router.push('/dashboard/procurement/purchase-orders');
+                // Redirect to edit page to add items
+                router.push(`/dashboard/procurement/purchase-orders/${response.data.id}`);
             }, 1500);
         } catch (err: any) {
             setError(err.response?.data?.detail || 'خطا در ایجاد');
@@ -57,8 +79,99 @@ export default function CreatePurchaseOrderPage() {
             )}
 
             <form onSubmit={handleSubmit} className="bg-white rounded shadow p-6">
-                <div className="text-gray-500 text-center py-8">
-                    فرم ایجاد سفارش خرید - فیلدها باید بر اساس مدل تکمیل شوند
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            شماره سفارش
+                        </label>
+                        <input
+                            type="text"
+                            name="po_number"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.po_number}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            تامین‌کننده
+                        </label>
+                        <select
+                            name="supplier"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.supplier}
+                            onChange={handleChange}
+                        >
+                            <option value="">انتخاب کنید...</option>
+                            {suppliers.map((supplier: any) => (
+                                <option key={supplier.id} value={supplier.id}>
+                                    {supplier.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            تاریخ
+                        </label>
+                        <input
+                            type="date"
+                            name="date"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.date}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            تاریخ تحویل مورد انتظار
+                        </label>
+                        <input
+                            type="date"
+                            name="expected_delivery_date"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.expected_delivery_date}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            وضعیت
+                        </label>
+                        <select
+                            name="status"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.status}
+                            onChange={handleChange}
+                        >
+                            <option value="draft">پیش‌نویس</option>
+                            <option value="sent">ارسال شده</option>
+                            <option value="confirmed">تایید شده</option>
+                            <option value="received">دریافت شده</option>
+                            <option value="cancelled">لغو شده</option>
+                        </select>
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            یادداشت‌ها
+                        </label>
+                        <textarea
+                            name="notes"
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            value={formData.notes}
+                            onChange={handleChange}
+                        />
+                    </div>
                 </div>
 
                 <div className="mt-6 flex gap-4">
@@ -67,7 +180,7 @@ export default function CreatePurchaseOrderPage() {
                         disabled={loading}
                         className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
                     >
-                        {loading ? 'در حال ذخیره...' : 'ذخیره'}
+                        {loading ? 'در حال ذخیره...' : 'ذخیره و ادامه'}
                     </button>
                     <button
                         type="button"
