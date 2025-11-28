@@ -9,7 +9,7 @@ export default function EditWarehousePage() {
     const router = useRouter();
     const params = useParams();
     const id = params.id;
-    
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -101,11 +101,63 @@ export default function EditWarehousePage() {
             )}
 
             <form onSubmit={handleSubmit} className="bg-white rounded shadow p-6">
-                <div className="text-gray-500 text-center py-8">
-                    فرم ویرایش - فیلدها باید بر اساس مدل تکمیل شوند
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            نام انبار <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name || ''}
+                            required
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            کد انبار <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="code"
+                            value={formData.code || ''}
+                            required
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            موقعیت
+                        </label>
+                        <textarea
+                            name="location"
+                            rows={3}
+                            value={formData.location || ''}
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="is_active"
+                                checked={formData.is_active || false}
+                                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                onChange={handleChange}
+                            />
+                            <span className="text-sm text-gray-700">انبار فعال است</span>
+                        </label>
+                    </div>
                 </div>
 
-                <div className="mt-6 flex gap-4">
+                <div className="mt-8 flex gap-4 border-t pt-6">
                     <button
                         type="submit"
                         disabled={saving}

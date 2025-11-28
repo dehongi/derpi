@@ -9,7 +9,7 @@ export default function EditItemPage() {
     const router = useRouter();
     const params = useParams();
     const id = params.id;
-    
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -101,11 +101,154 @@ export default function EditItemPage() {
             )}
 
             <form onSubmit={handleSubmit} className="bg-white rounded shadow p-6">
-                <div className="text-gray-500 text-center py-8">
-                    فرم ویرایش - فیلدها باید بر اساس مدل تکمیل شوند
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            نام کالا <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name || ''}
+                            required
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            کد کالا (SKU) <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="sku"
+                            value={formData.sku || ''}
+                            required
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            بارکد
+                        </label>
+                        <input
+                            type="text"
+                            name="barcode"
+                            value={formData.barcode || ''}
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            دسته‌بندی
+                        </label>
+                        <input
+                            type="text"
+                            name="category"
+                            value={formData.category || ''}
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            واحد <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                            name="unit"
+                            value={formData.unit || 'piece'}
+                            required
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        >
+                            <option value="piece">عدد</option>
+                            <option value="kg">کیلوگرم</option>
+                            <option value="liter">لیتر</option>
+                            <option value="meter">متر</option>
+                            <option value="box">جعبه</option>
+                            <option value="pack">بسته</option>
+                        </select>
+                    </div>
+
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            قیمت تمام شده
+                        </label>
+                        <input
+                            type="number"
+                            name="cost"
+                            value={formData.cost || 0}
+                            min="0"
+                            step="0.01"
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            حداقل موجودی
+                        </label>
+                        <input
+                            type="number"
+                            name="min_stock"
+                            value={formData.min_stock || 0}
+                            min="0"
+                            step="0.01"
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            حداکثر موجودی
+                        </label>
+                        <input
+                            type="number"
+                            name="max_stock"
+                            value={formData.max_stock || 0}
+                            min="0"
+                            step="0.01"
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            توضیحات
+                        </label>
+                        <textarea
+                            name="description"
+                            rows={3}
+                            value={formData.description || ''}
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="col-span-3">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="is_active"
+                                checked={formData.is_active || false}
+                                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                onChange={handleChange}
+                            />
+                            <span className="text-sm text-gray-700">کالا فعال است</span>
+                        </label>
+                    </div>
                 </div>
 
-                <div className="mt-6 flex gap-4">
+                <div className="mt-8 flex gap-4 border-t pt-6">
                     <button
                         type="submit"
                         disabled={saving}
