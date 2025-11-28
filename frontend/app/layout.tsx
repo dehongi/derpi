@@ -20,6 +20,25 @@ const vazirmatn = Vazirmatn({
 export const metadata: Metadata = {
   title: "Derpi",
   description: "Enterprise Resource Planning System",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Derpi",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  themeColor: "#6366f1",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+  },
 };
 
 export default function RootLayout({
@@ -29,6 +48,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
+      <head>
+        <script src="/sw-register.js" defer></script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${vazirmatn.variable} antialiased font-sans`}
       >
