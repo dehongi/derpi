@@ -17,7 +17,7 @@ export default function LandingPage() {
                     </h1>
                     <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto text-white/90 animate-fade-in" style={{ animationDelay: '0.1s' }}>
                         یک پلتفرم جامع برای مدیریت منابع، فرآیندها و ارتباطات سازمانی.
-                        با ERP System، بهره‌وری خود را به سطح جدیدی برسانید.
+                        با Derpi، بهره‌وری خود را به سطح جدیدی برسانید.
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                         <Link
@@ -65,7 +65,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
-                            چرا <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">ERP System</span>؟
+                            چرا <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Derpi</span>؟
                         </h2>
                         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                             ابزارهای قدرتمند برای مدیریت هوشمند کسب‌وکار شما
@@ -149,7 +149,7 @@ export default function LandingPage() {
                         آماده تحول در کسب‌وکارتان هستید؟
                     </h2>
                     <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-                        همین امروز به جمع هزاران مدیر موفق بپیوندید که با ERP System کسب‌وکار خود را متحول کرده‌اند.
+                        همین امروز به جمع هزاران مدیر موفق بپیوندید که با Derpi کسب‌وکار خود را متحول کرده‌اند.
                     </p>
                     <Link
                         href="/signup"

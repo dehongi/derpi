@@ -20,13 +20,13 @@ export default function PublicLayout({
   return (
     <div className="min-h-screen flex flex-col bg-gray-50" dir="rtl">
       <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-          ? 'glass-effect shadow-lg'
-          : 'bg-white/80 backdrop-blur-sm'
+        ? 'glass-effect shadow-lg'
+        : 'bg-white/80 backdrop-blur-sm'
         }`}>
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <a href="/" className="text-2xl font-bold">
-              <span className="gradient-text">ERP System</span>
+              <span className="gradient-text">Derpi</span>
             </a>
             <nav className="flex gap-6 items-center">
               <a href="/" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">خانه</a>
@@ -52,7 +52,7 @@ export default function PublicLayout({
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="text-2xl font-bold mb-4 gradient-text">ERP System</h3>
+              <h3 className="text-2xl font-bold mb-4 gradient-text">Derpi</h3>
               <p className="text-gray-400 leading-relaxed">
                 پلتفرم جامع مدیریت منابع سازمانی برای کسب‌وکارهای مدرن
               </p>
@@ -88,7 +88,7 @@ export default function PublicLayout({
 
           <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 mb-4 md:mb-0">
-              &copy; 2024 ERP System. تمامی حقوق محفوظ است.
+              &copy; 2024 Derpi. تمامی حقوق محفوظ است.
             </p>
             <div className="flex gap-4">
               <a href="#" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
