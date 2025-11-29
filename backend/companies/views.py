@@ -87,3 +87,24 @@ def get_active_company(request):
         return Response(CompanySerializer(request.user.active_company).data)
     return Response({'message': 'هیچ شرکت فعالی تنظیم نشده است'}, status=status.HTTP_404_NOT_FOUND)
 
+
+class CompanyUsersView(generics.ListAPIView):
+    """List all users who are members of the current active company"""
+    from accounts.serializers import UserUpdateSerializer
+    serializer_class = UserUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        if not self.request.user.active_company:
+            return User.objects.none()
+        
+        # Get all users who are members of the active company
+        # We filter by CompanyMembership for the active company
+        return User.objects.filter(
+            company_memberships__company=self.request.user.active_company,
+            company_memberships__is_active=True
+        ).distinct()
+

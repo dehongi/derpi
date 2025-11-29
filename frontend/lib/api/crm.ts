@@ -23,4 +23,4 @@ export const deleteActivity = (id: string | number) => api.delete(`/crm/activity
 
 // Helper functions
 export const getContacts = () => api.get('/contacts/');
-export const getUsers = () => api.get('/accounts/users/'); // For assignment dropdowns
+export const getUsers = () => api.get('/companies/active/users/'); // For assignment dropdowns
