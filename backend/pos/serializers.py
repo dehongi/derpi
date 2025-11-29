@@ -117,8 +117,9 @@ class POSSaleCreateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = POSSale
-        fields = ['date', 'customer', 'discount', 'tax', 'paid_amount',
+        fields = ['id', 'sale_number', 'date', 'customer', 'discount', 'tax', 'paid_amount',
                   'payment_method', 'notes', 'items']
+        read_only_fields = ['id', 'sale_number']
     
     def validate_items(self, items):
         """Validate that items list is not empty"""

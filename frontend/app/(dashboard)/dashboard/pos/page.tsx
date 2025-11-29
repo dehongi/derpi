@@ -62,7 +62,7 @@ export default function POSPage() {
 
     const fetchCustomers = async () => {
         try {
-            const response = await api.get('/contacts/contacts/?contact_type=customer');
+            const response = await api.get('/contacts/?contact_type=customer');
             setCustomers(response.data);
         } catch (error) {
             console.error('Error fetching customers:', error);
