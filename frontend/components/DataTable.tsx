@@ -12,9 +12,10 @@ interface DataTableProps {
     onEdit?: (row: any) => void;
     onDelete?: (row: any) => void;
     loading?: boolean;
+    customActions?: (row: any) => React.ReactNode;
 }
 
-export default function DataTable({ columns, data, onEdit, onDelete, loading }: DataTableProps) {
+export default function DataTable({ columns, data, onEdit, onDelete, loading, customActions }: DataTableProps) {
     if (loading) {
         return (
             <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-gray-100">
@@ -50,7 +51,7 @@ export default function DataTable({ columns, data, onEdit, onDelete, loading }: 
                                     {column.label}
                                 </th>
                             ))}
-                            {(onEdit || onDelete) && (
+                            {(onEdit || onDelete || customActions) && (
                                 <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
                                     عملیات
                                 </th>
@@ -65,9 +66,10 @@ export default function DataTable({ columns, data, onEdit, onDelete, loading }: 
                                         {column.render ? column.render(row[column.key], row) : row[column.key]}
                                     </td>
                                 ))}
-                                {(onEdit || onDelete) && (
+                                {(onEdit || onDelete || customActions) && (
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div className="flex gap-3">
+                                            {customActions && customActions(row)}
                                             {onEdit && (
                                                 <button
                                                     onClick={() => onEdit(row)}

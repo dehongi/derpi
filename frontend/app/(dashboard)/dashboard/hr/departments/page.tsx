@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
-import api from '@/utils/api';
+import { getDepartments, deleteDepartment } from '@/lib/api/hr';
+import { Department } from '@/lib/types/hr';
 
 export default function DepartmentsPage() {
     const router = useRouter();
-    const [items, setItems] = useState([]);
+    const [items, setItems] = useState<Department[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -17,7 +18,7 @@ export default function DepartmentsPage() {
 
     const fetchItems = async () => {
         try {
-            const response = await api.get('/hr/departments/');
+            const response = await getDepartments();
             setItems(response.data);
         } catch (error) {
             console.error('Error fetching items:', error);
@@ -26,14 +27,14 @@ export default function DepartmentsPage() {
         }
     };
 
-    const handleEdit = (item: any) => {
+    const handleEdit = (item: Department) => {
         router.push(`/dashboard/hr/departments/${item.id}`);
     };
 
-    const handleDelete = async (item: any) => {
+    const handleDelete = async (item: Department) => {
         if (confirm('آیا از حذف این مورد اطمینان دارید؟')) {
             try {
-                await api.delete(`/hr/departments/${item.id}/`);
+                await deleteDepartment(item.id);
                 fetchItems();
             } catch (error) {
                 console.error('Error deleting item:', error);
@@ -42,7 +43,7 @@ export default function DepartmentsPage() {
         }
     };
 
-        const columns = [
+    const columns = [
         { key: 'id', label: 'شناسه' },
         { key: 'name', label: 'نام بخش' },
         { key: 'description', label: 'توضیحات' },

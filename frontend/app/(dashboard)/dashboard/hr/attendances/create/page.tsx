@@ -3,23 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
-import { createLeave, getEmployees } from '@/lib/api/hr';
-import { Leave, Employee } from '@/lib/types/hr';
+import { createAttendance, getEmployees } from '@/lib/api/hr';
+import { Attendance, Employee } from '@/lib/types/hr';
 
-export default function CreateLeavePage() {
+export default function CreateAttendancePage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [employees, setEmployees] = useState<Employee[]>([]);
 
-    const [formData, setFormData] = useState<Partial<Leave>>({
-        leave_type: 'annual',
-        start_date: '',
-        end_date: '',
-        days: 1,
-        reason: '',
-        status: 'pending',
+    const [formData, setFormData] = useState<Partial<Attendance>>({
+        date: new Date().toISOString().split('T')[0],
+        status: 'present',
     });
 
     useEffect(() => {
@@ -47,13 +43,13 @@ export default function CreateLeavePage() {
         setSuccess('');
 
         try {
-            await createLeave(formData);
-            setSuccess('مرخصی با موفقیت ایجاد شد');
+            await createAttendance(formData);
+            setSuccess('حضور و غیاب با موفقیت ثبت شد');
             setTimeout(() => {
-                router.push('/dashboard/hr/leaves');
+                router.push('/dashboard/hr/attendances');
             }, 1500);
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'خطا در ایجاد');
+            setError(err.response?.data?.detail || 'خطا در ثبت');
         } finally {
             setLoading(false);
         }
@@ -62,8 +58,8 @@ export default function CreateLeavePage() {
     return (
         <div>
             <PageHeader
-                title="افزودن مرخصی جدید"
-                subtitle="ایجاد مرخصی جدید در سیستم"
+                title="ثبت حضور و غیاب"
+                subtitle="ثبت رکورد جدید حضور و غیاب"
             />
 
             {error && (
@@ -90,36 +86,31 @@ export default function CreateLeavePage() {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="leave_type" className="block text-sm font-medium text-gray-700">نوع مرخصی</label>
-                        <select name="leave_type" id="leave_type" value={formData.leave_type} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                            <option value="annual">استحقاقی</option>
-                            <option value="sick">استعلاجی</option>
-                            <option value="unpaid">بدون حقوق</option>
-                        </select>
+                        <label htmlFor="date" className="block text-sm font-medium text-gray-700">تاریخ</label>
+                        <input type="date" name="date" id="date" required value={formData.date} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
                     </div>
-                    <div>
-                        <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">تاریخ شروع</label>
-                        <input type="date" name="start_date" id="start_date" required value={formData.start_date} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
-                    </div>
-                    <div>
-                        <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">تاریخ پایان</label>
-                        <input type="date" name="end_date" id="end_date" required value={formData.end_date} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
-                    </div>
-                    <div>
-                        <label htmlFor="days" className="block text-sm font-medium text-gray-700">تعداد روز</label>
-                        <input type="number" name="days" id="days" required value={formData.days} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="check_in" className="block text-sm font-medium text-gray-700">ساعت ورود</label>
+                            <input type="time" name="check_in" id="check_in" value={formData.check_in || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
+                        </div>
+                        <div>
+                            <label htmlFor="check_out" className="block text-sm font-medium text-gray-700">ساعت خروج</label>
+                            <input type="time" name="check_out" id="check_out" value={formData.check_out || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
+                        </div>
                     </div>
                     <div>
                         <label htmlFor="status" className="block text-sm font-medium text-gray-700">وضعیت</label>
                         <select name="status" id="status" value={formData.status} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                            <option value="pending">در انتظار</option>
-                            <option value="approved">تایید شده</option>
-                            <option value="rejected">رد شده</option>
+                            <option value="present">حاضر</option>
+                            <option value="absent">غایب</option>
+                            <option value="late">تاخیر</option>
+                            <option value="half_day">نیم روز</option>
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="reason" className="block text-sm font-medium text-gray-700">دلیل</label>
-                        <textarea name="reason" id="reason" rows={3} required value={formData.reason} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
+                        <label htmlFor="notes" className="block text-sm font-medium text-gray-700">یادداشت‌ها</label>
+                        <textarea name="notes" id="notes" rows={3} value={formData.notes || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
                     </div>
                 </div>
 
@@ -127,7 +118,7 @@ export default function CreateLeavePage() {
                     <button type="submit" disabled={loading} className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400">
                         {loading ? 'در حال ذخیره...' : 'ذخیره'}
                     </button>
-                    <button type="button" onClick={() => router.push('/dashboard/hr/leaves')} className="bg-gray-200 text-gray-700 px-6 py-2 rounded hover:bg-gray-300">
+                    <button type="button" onClick={() => router.push('/dashboard/hr/attendances')} className="bg-gray-200 text-gray-700 px-6 py-2 rounded hover:bg-gray-300">
                         انصراف
                     </button>
                 </div>

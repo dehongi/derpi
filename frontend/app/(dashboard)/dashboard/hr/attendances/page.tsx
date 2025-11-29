@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
-import { getLeaves, deleteLeave } from '@/lib/api/hr';
-import { Leave } from '@/lib/types/hr';
+import { getAttendances, deleteAttendance } from '@/lib/api/hr';
+import { Attendance } from '@/lib/types/hr';
 
-export default function LeavesPage() {
+export default function AttendancesPage() {
     const router = useRouter();
-    const [items, setItems] = useState<Leave[]>([]);
+    const [items, setItems] = useState<Attendance[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -18,7 +18,7 @@ export default function LeavesPage() {
 
     const fetchItems = async () => {
         try {
-            const response = await getLeaves();
+            const response = await getAttendances();
             setItems(response.data);
         } catch (error) {
             console.error('Error fetching items:', error);
@@ -27,14 +27,14 @@ export default function LeavesPage() {
         }
     };
 
-    const handleEdit = (item: Leave) => {
-        router.push(`/dashboard/hr/leaves/${item.id}`);
+    const handleEdit = (item: Attendance) => {
+        router.push(`/dashboard/hr/attendances/${item.id}`);
     };
 
-    const handleDelete = async (item: Leave) => {
+    const handleDelete = async (item: Attendance) => {
         if (confirm('آیا از حذف این مورد اطمینان دارید؟')) {
             try {
-                await deleteLeave(item.id);
+                await deleteAttendance(item.id);
                 fetchItems();
             } catch (error) {
                 console.error('Error deleting item:', error);
@@ -45,24 +45,24 @@ export default function LeavesPage() {
 
     const columns = [
         { key: 'id', label: 'شناسه' },
-        { key: 'leave_type', label: 'نوع مرخصی' },
-        { key: 'start_date', label: 'تاریخ شروع' },
-        { key: 'end_date', label: 'تاریخ پایان' },
-        { key: 'days', label: 'تعداد روز' },
+        { key: 'employee', label: 'کارمند' },
+        { key: 'date', label: 'تاریخ' },
+        { key: 'check_in', label: 'ورود' },
+        { key: 'check_out', label: 'خروج' },
         { key: 'status', label: 'وضعیت' }
     ];
 
     return (
         <div>
             <PageHeader
-                title="مرخصی‌ها"
-                subtitle="مدیریت مرخصی‌ها"
+                title="حضور و غیاب"
+                subtitle="مدیریت حضور و غیاب"
                 action={
                     <button
-                        onClick={() => router.push('/dashboard/hr/leaves/create')}
+                        onClick={() => router.push('/dashboard/hr/attendances/create')}
                         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                     >
-                        افزودن مرخصی جدید
+                        ثبت حضور و غیاب
                     </button>
                 }
             />

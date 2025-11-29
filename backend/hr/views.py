@@ -64,13 +64,12 @@ class AttendanceListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_company = self.request.user.active_company
         if user_company:
-            return Attendance.objects.filter(company=user_company)
+            return Attendance.objects.filter(employee__company=user_company)
         return Attendance.objects.none()
 
     def perform_create(self, serializer):
-        user_company = self.request.user.active_company
-        if user_company:
-            serializer.save(company=user_company)
+        # No need to set company - it's determined through the employee
+        serializer.save()
 
 
 class AttendanceDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -80,7 +79,7 @@ class AttendanceDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_company = self.request.user.active_company
         if user_company:
-            return Attendance.objects.filter(company=user_company)
+            return Attendance.objects.filter(employee__company=user_company)
         return Attendance.objects.none()
 
 
@@ -91,13 +90,12 @@ class LeaveListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_company = self.request.user.active_company
         if user_company:
-            return Leave.objects.filter(company=user_company)
+            return Leave.objects.filter(employee__company=user_company)
         return Leave.objects.none()
 
     def perform_create(self, serializer):
-        user_company = self.request.user.active_company
-        if user_company:
-            serializer.save(company=user_company)
+        # No need to set company - it's determined through the employee
+        serializer.save()
 
 
 class LeaveDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -107,7 +105,7 @@ class LeaveDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_company = self.request.user.active_company
         if user_company:
-            return Leave.objects.filter(company=user_company)
+            return Leave.objects.filter(employee__company=user_company)
         return Leave.objects.none()
 
 

@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
-import api from '@/utils/api';
+import { getEmployees, deleteEmployee } from '@/lib/api/hr';
+import { Employee } from '@/lib/types/hr';
 
 export default function EmployeesPage() {
     const router = useRouter();
-    const [items, setItems] = useState([]);
+    const [items, setItems] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -17,7 +18,7 @@ export default function EmployeesPage() {
 
     const fetchItems = async () => {
         try {
-            const response = await api.get('/hr/employees/');
+            const response = await getEmployees();
             setItems(response.data);
         } catch (error) {
             console.error('Error fetching items:', error);
@@ -26,14 +27,14 @@ export default function EmployeesPage() {
         }
     };
 
-    const handleEdit = (item: any) => {
+    const handleEdit = (item: Employee) => {
         router.push(`/dashboard/hr/employees/${item.id}`);
     };
 
-    const handleDelete = async (item: any) => {
+    const handleDelete = async (item: Employee) => {
         if (confirm('آیا از حذف این مورد اطمینان دارید؟')) {
             try {
-                await api.delete(`/hr/employees/${item.id}/`);
+                await deleteEmployee(item.id);
                 fetchItems();
             } catch (error) {
                 console.error('Error deleting item:', error);
@@ -42,7 +43,7 @@ export default function EmployeesPage() {
         }
     };
 
-        const columns = [
+    const columns = [
         { key: 'id', label: 'شناسه' },
         { key: 'employee_number', label: 'شماره پرسنلی' },
         { key: 'first_name', label: 'نام' },
