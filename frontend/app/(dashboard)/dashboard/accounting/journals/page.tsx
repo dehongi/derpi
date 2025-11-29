@@ -6,7 +6,7 @@ import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
 import api from '@/utils/api';
 
-export default function ChartOfAccountsPage() {
+export default function JournalEntriesPage() {
     const router = useRouter();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ export default function ChartOfAccountsPage() {
 
     const fetchItems = async () => {
         try {
-            const response = await api.get('/accounting/chart-of-accountss/');
+            const response = await api.get('/accounting/journal-entries/');
             setItems(response.data);
         } catch (error) {
             console.error('Error fetching items:', error);
@@ -27,13 +27,13 @@ export default function ChartOfAccountsPage() {
     };
 
     const handleEdit = (item: any) => {
-        router.push(`/dashboard/accounting/chart-of-accountss/${item.id}`);
+        router.push(`/dashboard/accounting/journals/${item.id}`);
     };
 
     const handleDelete = async (item: any) => {
         if (confirm('آیا از حذف این مورد اطمینان دارید؟')) {
             try {
-                await api.delete(`/accounting/chart-of-accountss/${item.id}/`);
+                await api.delete(`/accounting/journal-entries/${item.id}/`);
                 fetchItems();
             } catch (error) {
                 console.error('Error deleting item:', error);
@@ -42,25 +42,40 @@ export default function ChartOfAccountsPage() {
         }
     };
 
-        const columns = [
+    const statusLabels: Record<string, string> = {
+        'draft': 'پیش‌نویس',
+        'posted': 'ثبت شده',
+        'cancelled': 'لغو شده'
+    };
+
+    const columns = [
         { key: 'id', label: 'شناسه' },
-        { key: 'code', label: 'کد حساب' },
-        { key: 'name', label: 'نام حساب' },
-        { key: 'account_type', label: 'نوع حساب' },
-        { key: 'is_active', label: 'وضعیت', render: (value: boolean) => <span className={`px-2 py-1 rounded text-xs ${value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{value ? 'فعال' : 'غیرفعال'}</span> }
+        { key: 'entry_number', label: 'شماره سند' },
+        { key: 'date', label: 'تاریخ' },
+        { key: 'description', label: 'شرح' },
+        {
+            key: 'status', label: 'وضعیت', render: (value: string) => {
+                const colors: Record<string, string> = {
+                    'draft': 'bg-yellow-100 text-yellow-800',
+                    'posted': 'bg-green-100 text-green-800',
+                    'cancelled': 'bg-red-100 text-red-800'
+                };
+                return <span className={`px-2 py-1 rounded text-xs ${colors[value] || ''}`}>{statusLabels[value] || value}</span>;
+            }
+        }
     ];
 
     return (
         <div>
             <PageHeader
-                title="دفتر حساب‌ها"
-                subtitle="مدیریت دفتر حساب‌ها"
+                title="اسناد حسابداری"
+                subtitle="مدیریت اسناد حسابداری"
                 action={
                     <button
-                        onClick={() => router.push('/dashboard/accounting/chart-of-accountss/create')}
+                        onClick={() => router.push('/dashboard/accounting/journals/create')}
                         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                     >
-                        افزودن حساب جدید
+                        افزودن سند جدید
                     </button>
                 }
             />
