@@ -17,6 +17,15 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only_fields = ('created_at', 'updated_at')
 
 
+class MarketplaceProductSerializer(ProductSerializer):
+    company_name = serializers.CharField(source='company.name', read_only=True)
+
+    class Meta(ProductSerializer.Meta):
+        # fields = '__all__' is inherited from ProductSerializer.Meta
+        # Declared fields (company_name) are automatically included when fields='__all__'
+        pass
+
+
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order

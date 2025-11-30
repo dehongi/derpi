@@ -4,6 +4,7 @@ from .views import (
     ProductListCreateView, ProductDetailView,
     OrderListCreateView, OrderDetailView,
     OrderItemListCreateView, OrderItemDetailView,
+    MarketplaceProductListView, MarketplaceProductDetailView,
 )
 
 urlpatterns = [
@@ -15,4 +16,8 @@ urlpatterns = [
     path('orders/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
     path('order-items/', OrderItemListCreateView.as_view(), name='order-item-list-create'),
     path('order-items/<int:pk>/', OrderItemDetailView.as_view(), name='order-item-detail'),
+    
+    # Marketplace Endpoints
+    path('marketplace/products/', MarketplaceProductListView.as_view(), name='marketplace-product-list'),
+    path('marketplace/products/<int:pk>/', MarketplaceProductDetailView.as_view(), name='marketplace-product-detail'),
 ]

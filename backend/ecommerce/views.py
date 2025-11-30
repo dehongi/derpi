@@ -1,6 +1,9 @@
 from rest_framework import generics, permissions
 from .models import Category, Product, Order, OrderItem
-from .serializers import CategorySerializer, ProductSerializer, OrderSerializer, OrderItemSerializer
+from .serializers import (
+    CategorySerializer, ProductSerializer, OrderSerializer, 
+    OrderItemSerializer, MarketplaceProductSerializer
+)
 
 
 class CategoryListCreateView(generics.ListCreateAPIView):
@@ -92,11 +95,32 @@ class OrderItemListCreateView(generics.ListCreateAPIView):
         return OrderItem.objects.all()
 
 
+
 class OrderItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderItemSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return OrderItem.objects.all()
+
+
+class MarketplaceProductListView(generics.ListAPIView):
+    """
+    Public view to list all active products from all companies.
+    """
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        return Product.objects.filter(is_active=True, stock_quantity__gt=0).select_related('company', 'category')
+
+
+class MarketplaceProductDetailView(generics.RetrieveAPIView):
+    """
+    Public view to retrieve a single product detail.
+    """
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = Product.objects.filter(is_active=True)
 
 
