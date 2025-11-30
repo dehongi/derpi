@@ -1,6 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import Link from "next/link";
+
+function AuthButtons() {
+  const { isAuthenticated, loading, logout } = useAuth();
+
+  if (loading) return null;
+
+  if (isAuthenticated) {
+    return (
+      <div className="flex items-center gap-4">
+        <Link
+          href="/dashboard"
+          className="text-gray-700 hover:text-purple-600 transition-colors font-medium flex items-center gap-2"
+        >
+          <span>داشبورد</span>
+          <span className="text-xl">📊</span>
+        </Link>
+        <button
+          onClick={logout}
+          className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm"
+        >
+          خروج
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Link href="/login" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">ورود</Link>
+      <Link
+        href="/signup"
+        className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 font-medium"
+      >
+        ثبت نام
+      </Link>
+    </>
+  );
+}
 
 export default function PublicLayout({
   children,
@@ -32,13 +72,8 @@ export default function PublicLayout({
               <a href="/" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">خانه</a>
               <a href="/about" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">درباره ما</a>
               <a href="/contact" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">تماس با ما</a>
-              <a href="/login" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">ورود</a>
-              <a
-                href="/signup"
-                className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 font-medium"
-              >
-                ثبت نام
-              </a>
+
+              <AuthButtons />
             </nav>
           </div>
         </div>
@@ -62,6 +97,7 @@ export default function PublicLayout({
               <h4 className="text-lg font-semibold mb-4">دسترسی سریع</h4>
               <ul className="space-y-2">
                 <li><a href="/" className="text-gray-400 hover:text-white transition-colors">خانه</a></li>
+                <li><a href="/marketplace" className="text-gray-400 hover:text-white transition-colors">فروشگاه</a></li>
                 <li><a href="/about" className="text-gray-400 hover:text-white transition-colors">درباره ما</a></li>
                 <li><a href="/contact" className="text-gray-400 hover:text-white transition-colors">تماس با ما</a></li>
                 <li><a href="/login" className="text-gray-400 hover:text-white transition-colors">ورود</a></li>
