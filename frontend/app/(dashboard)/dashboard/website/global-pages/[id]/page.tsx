@@ -1,13 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import api from '@/utils/api';
 
-export default function CreatePagePage() {
+export default function EditGlobalPagePage() {
     const router = useRouter();
+    const params = useParams();
+    const id = params.id;
     const [loading, setLoading] = useState(false);
+    const [fetchLoading, setFetchLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -20,26 +23,47 @@ export default function CreatePagePage() {
         meta_keywords: '',
         is_published: false,
         published_date: '',
+        order: 0,
     });
+
+    useEffect(() => {
+        fetchPage();
+    }, [id]);
+
+    const fetchPage = async () => {
+        try {
+            const response = await api.get(`/website/global-pages/${id}/`);
+            const data = response.data;
+            setFormData({
+                title: data.title || '',
+                slug: data.slug || '',
+                content: data.content || '',
+                meta_title: data.meta_title || '',
+                meta_description: data.meta_description || '',
+                meta_keywords: data.meta_keywords || '',
+                is_published: data.is_published || false,
+                published_date: data.published_date ? data.published_date.slice(0, 16) : '',
+                order: data.order || 0,
+            });
+        } catch (error: any) {
+            console.error('Error fetching page:', error);
+            if (error.response?.status === 403) {
+                setError('شما دسترسی به این بخش ندارید.');
+            } else {
+                setError('خطا در بارگذاری صفحه');
+            }
+        } finally {
+            setFetchLoading(false);
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
         const checked = (e.target as HTMLInputElement).checked;
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: type === 'checkbox' ? checked : (type === 'number' ? parseInt(value) || 0 : value)
         }));
-
-        // Auto-generate slug from title
-        if (name === 'title' && !formData.slug) {
-            const slug = value
-                .toLowerCase()
-                .replace(/[^a-z0-9\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .trim();
-            setFormData(prev => ({ ...prev, slug }));
-        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -53,23 +77,38 @@ export default function CreatePagePage() {
                 ...formData,
                 published_date: formData.published_date || null,
             };
-            await api.post('/website/pages/', submitData);
-            setSuccess('صفحه با موفقیت ایجاد شد');
+            await api.put(`/website/global-pages/${id}/`, submitData);
+            setSuccess('صفحه سراسری با موفقیت بروزرسانی شد');
             setTimeout(() => {
-                router.push('/dashboard/website/pages');
+                router.push('/dashboard/website/global-pages');
             }, 1500);
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'خطا در ایجاد');
+            setError(err.response?.data?.detail || 'خطا در بروزرسانی');
         } finally {
             setLoading(false);
         }
     };
 
+    const handleDelete = async () => {
+        if (!confirm('آیا از حذف این صفحه اطمینان دارید؟')) return;
+
+        try {
+            await api.delete(`/website/global-pages/${id}/`);
+            router.push('/dashboard/website/global-pages');
+        } catch (err: any) {
+            setError(err.response?.data?.detail || 'خطا در حذف');
+        }
+    };
+
+    if (fetchLoading) {
+        return <div className="text-center py-8">در حال بارگذاری...</div>;
+    }
+
     return (
         <div>
             <PageHeader
-                title="افزودن صفحه جدید"
-                subtitle="ایجاد صفحه جدید در سیستم"
+                title="ویرایش صفحه سراسری"
+                subtitle="بروزرسانی اطلاعات صفحه سراسری"
             />
 
             {error && (
@@ -126,6 +165,20 @@ export default function CreatePagePage() {
                             rows={10}
                             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            ترتیب نمایش
+                        </label>
+                        <input
+                            type="number"
+                            name="order"
+                            value={formData.order}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">عدد کمتر = اولویت بالاتر در منو</p>
                     </div>
 
                     <div className="md:col-span-2">
@@ -209,14 +262,21 @@ export default function CreatePagePage() {
                         disabled={loading}
                         className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
                     >
-                        {loading ? 'در حال ذخیره...' : 'ذخیره'}
+                        {loading ? 'در حال ذخیره...' : 'بروزرسانی'}
                     </button>
                     <button
                         type="button"
-                        onClick={() => router.push('/dashboard/website/pages')}
+                        onClick={() => router.push('/dashboard/website/global-pages')}
                         className="bg-gray-200 text-gray-700 px-6 py-2 rounded hover:bg-gray-300"
                     >
                         انصراف
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleDelete}
+                        className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 mr-auto"
+                    >
+                        حذف
                     </button>
                 </div>
             </form>

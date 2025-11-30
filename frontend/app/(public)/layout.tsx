@@ -70,6 +70,8 @@ export default function PublicLayout({
             </a>
             <nav className="flex gap-6 items-center">
               <a href="/" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">خانه</a>
+              <a href="/marketplace" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">فروشگاه</a>
+              <a href="/blog" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">وبلاگ</a>
               <a href="/about" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">درباره ما</a>
               <a href="/contact" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">تماس با ما</a>
 
@@ -98,6 +100,7 @@ export default function PublicLayout({
               <ul className="space-y-2">
                 <li><a href="/" className="text-gray-400 hover:text-white transition-colors">خانه</a></li>
                 <li><a href="/marketplace" className="text-gray-400 hover:text-white transition-colors">فروشگاه</a></li>
+                <li><a href="/blog" className="text-gray-400 hover:text-white transition-colors">وبلاگ</a></li>
                 <li><a href="/about" className="text-gray-400 hover:text-white transition-colors">درباره ما</a></li>
                 <li><a href="/contact" className="text-gray-400 hover:text-white transition-colors">تماس با ما</a></li>
                 <li><a href="/login" className="text-gray-400 hover:text-white transition-colors">ورود</a></li>
@@ -115,7 +118,7 @@ export default function PublicLayout({
             <div>
               <h4 className="text-lg font-semibold mb-4">تماس با ما</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>📧 info@erpsystem.com</li>
+                <li>📧 info@derpi.ir</li>
                 <li>📞 021-12345678</li>
                 <li>📍 تهران، ایران</li>
               </ul>

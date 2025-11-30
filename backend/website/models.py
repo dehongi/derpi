@@ -3,6 +3,30 @@ from django.conf import settings
 from companies.models import Company
 
 
+class GlobalPage(models.Model):
+    """Global website pages managed by superusers only (About, Terms, Privacy, etc.)"""
+    title = models.CharField(max_length=255, verbose_name='عنوان')
+    slug = models.SlugField(max_length=255, unique=True, verbose_name='نامک')
+    content = models.TextField(verbose_name='محتوا')
+    meta_title = models.CharField(max_length=255, blank=True, null=True, verbose_name='عنوان متا')
+    meta_description = models.TextField(blank=True, null=True, verbose_name='توضیحات متا')
+    meta_keywords = models.CharField(max_length=255, blank=True, null=True, verbose_name='کلمات کلیدی متا')
+    is_published = models.BooleanField(default=False, verbose_name='منتشر شده')
+    published_date = models.DateTimeField(blank=True, null=True, verbose_name='تاریخ انتشار')
+    order = models.IntegerField(default=0, verbose_name='ترتیب')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name='نویسنده')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='تاریخ بروزرسانی')
+
+    class Meta:
+        verbose_name = 'صفحه سراسری'
+        verbose_name_plural = 'صفحات سراسری'
+        ordering = ['order', '-created_at']
+
+    def __str__(self):
+        return self.title
+
+
 class Page(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='pages', verbose_name='شرکت')
     title = models.CharField(max_length=255, verbose_name='عنوان')

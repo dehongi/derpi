@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import api from '@/utils/api';
 
-export default function CreatePagePage() {
+export default function CreateGlobalPagePage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -20,6 +20,7 @@ export default function CreatePagePage() {
         meta_keywords: '',
         is_published: false,
         published_date: '',
+        order: 0,
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -27,7 +28,7 @@ export default function CreatePagePage() {
         const checked = (e.target as HTMLInputElement).checked;
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: type === 'checkbox' ? checked : (type === 'number' ? parseInt(value) || 0 : value)
         }));
 
         // Auto-generate slug from title
@@ -53,13 +54,17 @@ export default function CreatePagePage() {
                 ...formData,
                 published_date: formData.published_date || null,
             };
-            await api.post('/website/pages/', submitData);
-            setSuccess('صفحه با موفقیت ایجاد شد');
+            await api.post('/website/global-pages/', submitData);
+            setSuccess('صفحه سراسری با موفقیت ایجاد شد');
             setTimeout(() => {
-                router.push('/dashboard/website/pages');
+                router.push('/dashboard/website/global-pages');
             }, 1500);
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'خطا در ایجاد');
+            if (err.response?.status === 403) {
+                setError('شما دسترسی به این عملیات ندارید. فقط سوپریوزرها می‌توانند صفحات سراسری ایجاد کنند.');
+            } else {
+                setError(err.response?.data?.detail || 'خطا در ایجاد');
+            }
         } finally {
             setLoading(false);
         }
@@ -68,8 +73,8 @@ export default function CreatePagePage() {
     return (
         <div>
             <PageHeader
-                title="افزودن صفحه جدید"
-                subtitle="ایجاد صفحه جدید در سیستم"
+                title="افزودن صفحه سراسری جدید"
+                subtitle="ایجاد صفحه سراسری جدید در سیستم (فقط سوپریوزر)"
             />
 
             {error && (
@@ -126,6 +131,20 @@ export default function CreatePagePage() {
                             rows={10}
                             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            ترتیب نمایش
+                        </label>
+                        <input
+                            type="number"
+                            name="order"
+                            value={formData.order}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">عدد کمتر = اولویت بالاتر در منو</p>
                     </div>
 
                     <div className="md:col-span-2">
@@ -213,7 +232,7 @@ export default function CreatePagePage() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => router.push('/dashboard/website/pages')}
+                        onClick={() => router.push('/dashboard/website/global-pages')}
                         className="bg-gray-200 text-gray-700 px-6 py-2 rounded hover:bg-gray-300"
                     >
                         انصراف
