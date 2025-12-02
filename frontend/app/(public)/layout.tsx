@@ -4,24 +4,28 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 
-function AuthButtons() {
+function AuthButtons({ isMobile = false, onLinkClick = () => { } }: { isMobile?: boolean; onLinkClick?: () => void }) {
   const { isAuthenticated, loading, logout } = useAuth();
 
   if (loading) return null;
 
   if (isAuthenticated) {
     return (
-      <div className="flex items-center gap-4">
+      <div className={`flex ${isMobile ? 'flex-col w-full' : 'items-center'} gap-4`}>
         <Link
           href="/dashboard"
-          className="text-gray-700 hover:text-purple-600 transition-colors font-medium flex items-center gap-2"
+          onClick={onLinkClick}
+          className={`text-gray-700 hover:text-purple-600 transition-colors font-medium flex items-center gap-2 ${isMobile ? 'px-6 py-3 hover:bg-purple-50 rounded-lg' : ''}`}
         >
           <span>داشبورد</span>
           <span className="text-xl">📊</span>
         </Link>
         <button
-          onClick={logout}
-          className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm"
+          onClick={() => {
+            logout();
+            onLinkClick();
+          }}
+          className={`${isMobile ? 'w-full' : ''} px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm`}
         >
           خروج
         </button>
@@ -30,15 +34,22 @@ function AuthButtons() {
   }
 
   return (
-    <>
-      <Link href="/login" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">ورود</Link>
+    <div className={`flex ${isMobile ? 'flex-col w-full' : 'items-center'} gap-4`}>
+      <Link
+        href="/login"
+        onClick={onLinkClick}
+        className={`text-gray-700 hover:text-purple-600 transition-colors font-medium ${isMobile ? 'px-6 py-3 hover:bg-purple-50 rounded-lg' : ''}`}
+      >
+        ورود
+      </Link>
       <Link
         href="/signup"
-        className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 font-medium"
+        onClick={onLinkClick}
+        className={`${isMobile ? 'w-full text-center' : ''} px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 font-medium`}
       >
         ثبت نام
       </Link>
-    </>
+    </div>
   );
 }
 
@@ -48,6 +59,7 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,6 +68,20 @@ export default function PublicLayout({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
+
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50" dir="rtl">
@@ -68,7 +94,9 @@ export default function PublicLayout({
             <a href="/" className="text-2xl font-bold">
               <span className="gradient-text">Derpi</span>
             </a>
-            <nav className="flex gap-6 items-center">
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex gap-6 items-center">
               <a href="/" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">خانه</a>
               <a href="/marketplace" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">فروشگاه</a>
               <a href="/blog" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">وبلاگ</a>
@@ -77,9 +105,115 @@ export default function PublicLayout({
 
               <AuthButtons />
             </nav>
+
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 text-gray-700 hover:text-purple-600 transition-colors"
+              aria-label="Toggle menu"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                {mobileMenuOpen ? (
+                  <path d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={closeMobileMenu}
+        />
+      )}
+
+      {/* Mobile Menu */}
+      <div
+        className={`fixed top-0 right-0 h-full w-80 max-w-[85%] bg-white shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Mobile Menu Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <span className="text-2xl font-bold gradient-text">Derpi</span>
+            <button
+              onClick={closeMobileMenu}
+              className="p-2 text-gray-700 hover:text-purple-600 transition-colors"
+              aria-label="Close menu"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Mobile Menu Links */}
+          <nav className="flex-1 overflow-y-auto py-6">
+            <div className="flex flex-col space-y-2 px-4">
+              <a
+                href="/"
+                onClick={closeMobileMenu}
+                className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 transition-colors font-medium px-6 py-3 rounded-lg"
+              >
+                خانه
+              </a>
+              <a
+                href="/marketplace"
+                onClick={closeMobileMenu}
+                className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 transition-colors font-medium px-6 py-3 rounded-lg"
+              >
+                فروشگاه
+              </a>
+              <a
+                href="/blog"
+                onClick={closeMobileMenu}
+                className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 transition-colors font-medium px-6 py-3 rounded-lg"
+              >
+                وبلاگ
+              </a>
+              <a
+                href="/about"
+                onClick={closeMobileMenu}
+                className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 transition-colors font-medium px-6 py-3 rounded-lg"
+              >
+                درباره ما
+              </a>
+              <a
+                href="/contact"
+                onClick={closeMobileMenu}
+                className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 transition-colors font-medium px-6 py-3 rounded-lg"
+              >
+                تماس با ما
+              </a>
+
+              <div className="pt-4 border-t border-gray-200 mt-4">
+                <AuthButtons isMobile={true} onLinkClick={closeMobileMenu} />
+              </div>
+            </div>
+          </nav>
+        </div>
+      </div>
 
       <main className="flex-grow">
         {children}
