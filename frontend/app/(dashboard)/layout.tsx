@@ -105,6 +105,12 @@ export default function DashboardLayout({
                                 <span className="font-medium">صندوق</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="/dashboard/delivery" onClick={closeSidebar} className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 hover:text-amber-700 rounded-lg transition-all group">
+                                <span className="text-xl">🚚</span>
+                                <span className="font-medium">حمل و نقل</span>
+                            </a>
+                        </li>
 
                         {/* Support Modules */}
                         <li className="pt-6">
