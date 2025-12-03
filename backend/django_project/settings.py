@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'accounting',
     'ecommerce',
     'website',
+    'delivery',
 ]
 
 REST_FRAMEWORK = {

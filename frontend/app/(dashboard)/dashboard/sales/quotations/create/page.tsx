@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import { createQuotation, createQuotationItem, getCustomers, getItems } from '@/lib/api/sales';
 
 export default function CreateQuotationPage() {
@@ -183,24 +184,18 @@ export default function CreateQuotationPage() {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">تاریخ</label>
-                        <input
-                            type="date"
-                            name="date"
+                        <JalaliDatePicker
+                            label="تاریخ"
                             value={formData.date}
-                            onChange={handleChange}
-                            className="w-full border rounded px-3 py-2"
+                            onChange={(date) => setFormData(prev => ({ ...prev, date }))}
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">اعتبار تا</label>
-                        <input
-                            type="date"
-                            name="valid_until"
+                        <JalaliDatePicker
+                            label="اعتبار تا"
                             value={formData.valid_until}
-                            onChange={handleChange}
-                            className="w-full border rounded px-3 py-2"
+                            onChange={(date) => setFormData(prev => ({ ...prev, valid_until: date }))}
                             required
                         />
                     </div>
