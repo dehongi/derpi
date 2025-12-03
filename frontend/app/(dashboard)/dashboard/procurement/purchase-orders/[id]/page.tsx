@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 import DataTable from '@/components/DataTable';
@@ -246,29 +247,19 @@ export default function EditPurchaseOrderPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            تاریخ
-                        </label>
-                        <input
-                            type="date"
-                            name="date"
-                            required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                        <JalaliDatePicker
+                            label="تاریخ"
                             value={formData.date}
-                            onChange={handleChange}
+                            onChange={(date) => setFormData((prev: any) => ({ ...prev, date }))}
+                            required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            تاریخ تحویل مورد انتظار
-                        </label>
-                        <input
-                            type="date"
-                            name="expected_delivery_date"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                        <JalaliDatePicker
+                            label="تاریخ تحویل مورد انتظار"
                             value={formData.expected_delivery_date || ''}
-                            onChange={handleChange}
+                            onChange={(date) => setFormData((prev: any) => ({ ...prev, expected_delivery_date: date }))}
                         />
                     </div>
 

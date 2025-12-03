@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import { getAttendances, deleteAttendance } from '@/lib/api/hr';
 import { Attendance } from '@/lib/types/hr';
 
@@ -46,7 +47,7 @@ export default function AttendancesPage() {
     const columns = [
         { key: 'id', label: 'شناسه' },
         { key: 'employee', label: 'کارمند' },
-        { key: 'date', label: 'تاریخ' },
+        { key: 'date', label: 'تاریخ', render: (value: string) => <JalaliDateDisplay date={value} /> },
         { key: 'check_in', label: 'ورود' },
         { key: 'check_out', label: 'خروج' },
         { key: 'status', label: 'وضعیت' }

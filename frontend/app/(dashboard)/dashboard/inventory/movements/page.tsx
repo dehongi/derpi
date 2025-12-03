@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 export default function StockMovementsPage() {
@@ -32,7 +33,7 @@ export default function StockMovementsPage() {
 
     const columns = [
         { key: 'id', label: 'شناسه' },
-        { key: 'date', label: 'تاریخ', render: (value: string) => new Date(value).toLocaleDateString('fa-IR') },
+        { key: 'date', label: 'تاریخ', render: (value: string) => <JalaliDateDisplay date={value} /> },
         { key: 'movement_type_display', label: 'نوع' },
         { key: 'item_name', label: 'کالا' },
         { key: 'warehouse_name', label: 'انبار' },

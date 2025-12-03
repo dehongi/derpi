@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 export default function PaymentsPage() {
@@ -42,10 +43,10 @@ export default function PaymentsPage() {
         }
     };
 
-        const columns = [
+    const columns = [
         { key: 'id', label: 'شناسه' },
         { key: 'payment_number', label: 'شماره پرداخت' },
-        { key: 'date', label: 'تاریخ' },
+        { key: 'date', label: 'تاریخ', render: (value: string) => <JalaliDateDisplay date={value} /> },
         { key: 'amount', label: 'مبلغ', render: (value: number) => value?.toLocaleString('fa-IR') + ' ریال' },
         { key: 'payment_method', label: 'روش پرداخت' }
     ];

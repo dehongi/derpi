@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import { getOpportunities, deleteOpportunity } from '@/lib/api/crm';
 
 export default function OpportunitiesPage() {
@@ -84,9 +85,7 @@ export default function OpportunitiesPage() {
         {
             key: 'expected_close_date',
             label: 'تاریخ بسته شدن',
-            render: (item: any) => item.expected_close_date
-                ? new Date(item.expected_close_date).toLocaleDateString('fa-IR')
-                : '-'
+            render: (item: any) => item.expected_close_date ? <JalaliDateDisplay date={item.expected_close_date} /> : '-'
         }
     ];
 

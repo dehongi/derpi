@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import { createOpportunity, getContacts, getLeads, getUsers } from '@/lib/api/crm';
 
 export default function CreateOpportunityPage() {
@@ -212,15 +213,10 @@ export default function CreateOpportunityPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            تاریخ بسته شدن مورد انتظار
-                        </label>
-                        <input
-                            type="date"
-                            name="expected_close_date"
+                        <JalaliDatePicker
+                            label="تاریخ بسته شدن مورد انتظار"
                             value={formData.expected_close_date}
-                            onChange={handleChange}
-                            className="w-full border rounded px-3 py-2"
+                            onChange={(date) => setFormData(prev => ({ ...prev, expected_close_date: date }))}
                         />
                     </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
@@ -29,7 +29,8 @@ export default function JalaliDatePicker({
     inputClass = ""
 }: JalaliDatePickerProps) {
     // Convert Gregorian value to Jalali DateObject for display
-    const getDateObject = () => {
+    // Using useMemo to ensure the DateObject is properly memoized
+    const dateObject = useMemo(() => {
         if (!value) return null;
 
         try {
@@ -43,7 +44,7 @@ export default function JalaliDatePicker({
             console.error('Error creating date object:', error);
             return null;
         }
-    };
+    }, [value]);
 
     const handleChange = (date: DateObject | DateObject[] | null) => {
         if (!date || Array.isArray(date)) {
@@ -71,7 +72,8 @@ export default function JalaliDatePicker({
                 </label>
             )}
             <DatePicker
-                value={getDateObject()}
+                key={value} // Force re-render when value changes
+                value={dateObject}
                 onChange={handleChange}
                 calendar={persian}
                 locale={persian_fa}

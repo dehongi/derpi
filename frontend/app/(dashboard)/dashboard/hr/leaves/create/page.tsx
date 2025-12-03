@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import { createLeave, getEmployees } from '@/lib/api/hr';
 import { Leave, Employee } from '@/lib/types/hr';
 
@@ -98,12 +99,20 @@ export default function CreateLeavePage() {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">تاریخ شروع</label>
-                        <input type="date" name="start_date" id="start_date" required value={formData.start_date} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
+                        <JalaliDatePicker
+                            label="تاریخ شروع"
+                            value={formData.start_date || ''}
+                            onChange={(date) => setFormData(prev => ({ ...prev, start_date: date }))}
+                            required
+                        />
                     </div>
                     <div>
-                        <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">تاریخ پایان</label>
-                        <input type="date" name="end_date" id="end_date" required value={formData.end_date} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
+                        <JalaliDatePicker
+                            label="تاریخ پایان"
+                            value={formData.end_date || ''}
+                            onChange={(date) => setFormData(prev => ({ ...prev, end_date: date }))}
+                            required
+                        />
                     </div>
                     <div>
                         <label htmlFor="days" className="block text-sm font-medium text-gray-700">تعداد روز</label>

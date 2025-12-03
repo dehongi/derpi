@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 export default function CreateStockMovementPage() {
@@ -99,16 +100,11 @@ export default function CreateStockMovementPage() {
                     </div>
 
                     <div className="col-span-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            تاریخ <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="date"
-                            name="date"
+                        <JalaliDatePicker
+                            label="تاریخ"
+                            value={formData.date}
+                            onChange={(date) => setFormData(prev => ({ ...prev, date }))}
                             required
-                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                            onChange={handleChange}
-                            defaultValue={new Date().toISOString().split('T')[0]}
                         />
                     </div>
 

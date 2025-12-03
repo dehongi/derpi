@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 export default function JournalEntriesPage() {
@@ -51,7 +52,7 @@ export default function JournalEntriesPage() {
     const columns = [
         { key: 'id', label: 'شناسه' },
         { key: 'entry_number', label: 'شماره سند' },
-        { key: 'date', label: 'تاریخ' },
+        { key: 'date', label: 'تاریخ', render: (value: string) => <JalaliDateDisplay date={value} /> },
         { key: 'description', label: 'شرح' },
         {
             key: 'status', label: 'وضعیت', render: (value: string) => {

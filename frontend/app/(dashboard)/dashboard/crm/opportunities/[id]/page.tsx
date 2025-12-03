@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import { getOpportunity, updateOpportunity, getContacts, getLeads, getUsers, getActivities } from '@/lib/api/crm';
 
 export default function EditOpportunityPage() {
@@ -165,8 +166,8 @@ export default function EditOpportunityPage() {
                             <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
                                     className={`h-2 rounded-full transition-all ${formData.stage === 'closed_won' ? 'bg-green-600' :
-                                            formData.stage === 'closed_lost' ? 'bg-red-600' :
-                                                'bg-blue-600'
+                                        formData.stage === 'closed_lost' ? 'bg-red-600' :
+                                            'bg-blue-600'
                                         }`}
                                     style={{ width: `${progress}%` }}
                                 />
@@ -290,15 +291,10 @@ export default function EditOpportunityPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    تاریخ بسته شدن مورد انتظار
-                                </label>
-                                <input
-                                    type="date"
-                                    name="expected_close_date"
-                                    value={formData.expected_close_date}
-                                    onChange={handleChange}
-                                    className="w-full border rounded px-3 py-2"
+                                <JalaliDatePicker
+                                    label="تاریخ بسته شدن مورد انتظار"
+                                    value={formData.expected_close_date || ''}
+                                    onChange={(date) => setFormData(prev => ({ ...prev, expected_close_date: date }))}
                                 />
                             </div>
 

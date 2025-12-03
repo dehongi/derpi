@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 export default function CreatePurchaseReceiptPage() {
@@ -88,15 +89,11 @@ export default function CreatePurchaseReceiptPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                تاریخ
-                            </label>
-                            <input
-                                type="date"
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+                            <JalaliDatePicker
+                                label="تاریخ"
                                 value={formData.date}
-                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                onChange={(date) => setFormData({ ...formData, date })}
+                                required
                             />
                         </div>
                     </div>

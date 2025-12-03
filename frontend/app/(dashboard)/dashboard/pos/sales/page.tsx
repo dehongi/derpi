@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import JalaliDatePicker, { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 export default function POSSalesPage() {
@@ -119,7 +120,7 @@ export default function POSSalesPage() {
         {
             key: 'date',
             label: 'تاریخ',
-            render: (value: string) => new Date(value).toLocaleDateString('fa-IR')
+            render: (value: string) => <JalaliDateDisplay date={value} />
         },
         { key: 'customer_name', label: 'مشتری', render: (value: string) => value || 'عمومی' },
         {
@@ -133,8 +134,8 @@ export default function POSSalesPage() {
             label: 'وضعیت',
             render: (value: string, row: any) => (
                 <span className={`px-2 py-1 rounded text-xs ${row.status === 'completed' ? 'bg-green-100 text-green-800' :
-                        row.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
+                    row.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
                     }`}>
                     {value}
                 </span>
@@ -161,21 +162,17 @@ export default function POSSalesPage() {
             <div className="bg-white rounded-lg shadow p-4 mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                        <label className="block text-sm text-gray-700 mb-1">از تاریخ</label>
-                        <input
-                            type="date"
+                        <JalaliDatePicker
+                            label="از تاریخ"
                             value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            className="w-full border border-gray-300 rounded px-3 py-2"
+                            onChange={setStartDate}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-700 mb-1">تا تاریخ</label>
-                        <input
-                            type="date"
+                        <JalaliDatePicker
+                            label="تا تاریخ"
                             value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            className="w-full border border-gray-300 rounded px-3 py-2"
+                            onChange={setEndDate}
                         />
                     </div>
                     <div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import { getEmployees, deleteEmployee } from '@/lib/api/hr';
 import { Employee } from '@/lib/types/hr';
 
@@ -48,6 +49,7 @@ export default function EmployeesPage() {
         { key: 'employee_number', label: 'شماره پرسنلی' },
         { key: 'first_name', label: 'نام' },
         { key: 'last_name', label: 'نام خانوادگی' },
+        { key: 'hire_date', label: 'تاریخ استخدام', render: (value: string) => <JalaliDateDisplay date={value} /> },
         { key: 'position', label: 'سمت' },
         { key: 'status', label: 'وضعیت' }
     ];

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import { createInvoice, createInvoiceItem, getCustomers, getItems, getSalesOrders } from '@/lib/api/sales';
 
 export default function CreateInvoicePage() {
@@ -204,24 +205,18 @@ export default function CreateInvoicePage() {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">تاریخ</label>
-                        <input
-                            type="date"
-                            name="date"
+                        <JalaliDatePicker
+                            label="تاریخ"
                             value={formData.date}
-                            onChange={handleChange}
-                            className="w-full border rounded px-3 py-2"
+                            onChange={(date) => setFormData(prev => ({ ...prev, date }))}
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">سررسید</label>
-                        <input
-                            type="date"
-                            name="due_date"
+                        <JalaliDatePicker
+                            label="سررسید"
                             value={formData.due_date}
-                            onChange={handleChange}
-                            className="w-full border rounded px-3 py-2"
+                            onChange={(date) => setFormData(prev => ({ ...prev, due_date: date }))}
                             required
                         />
                     </div>

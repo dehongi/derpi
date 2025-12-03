@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import { createAttendance, getEmployees } from '@/lib/api/hr';
 import { Attendance, Employee } from '@/lib/types/hr';
 
@@ -86,8 +87,12 @@ export default function CreateAttendancePage() {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="date" className="block text-sm font-medium text-gray-700">تاریخ</label>
-                        <input type="date" name="date" id="date" required value={formData.date} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" />
+                        <JalaliDatePicker
+                            label="تاریخ"
+                            value={formData.date || ''}
+                            onChange={(date) => setFormData(prev => ({ ...prev, date }))}
+                            required
+                        />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>

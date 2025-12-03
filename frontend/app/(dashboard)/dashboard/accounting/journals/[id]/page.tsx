@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 interface Transaction {
@@ -186,14 +187,11 @@ export default function EditJournalEntryPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-2">تاریخ *</label>
-                        <input
-                            type="date"
-                            name="date"
-                            value={formData.date}
-                            onChange={handleChange}
+                        <JalaliDatePicker
+                            label="تاریخ"
+                            value={formData.date || ''}
+                            onChange={(date) => setFormData(prev => ({ ...prev, date }))}
                             required
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
 

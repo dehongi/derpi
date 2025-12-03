@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 export default function QuotationsPage() {
@@ -42,10 +43,10 @@ export default function QuotationsPage() {
         }
     };
 
-        const columns = [
+    const columns = [
         { key: 'id', label: 'شناسه' },
         { key: 'quote_number', label: 'شماره پیش‌فاکتور' },
-        { key: 'date', label: 'تاریخ' },
+        { key: 'date', label: 'تاریخ', render: (value: string) => <JalaliDateDisplay date={value} /> },
         { key: 'total', label: 'مبلغ کل', render: (value: number) => value?.toLocaleString('fa-IR') + ' ریال' },
         { key: 'status', label: 'وضعیت' }
     ];

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import { createPayment, getInvoices } from '@/lib/api/sales';
 
 export default function CreatePaymentPage() {
@@ -114,13 +115,10 @@ export default function CreatePaymentPage() {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">تاریخ</label>
-                        <input
-                            type="date"
-                            name="date"
+                        <JalaliDatePicker
+                            label="تاریخ"
                             value={formData.date}
-                            onChange={handleChange}
-                            className="w-full border rounded px-3 py-2"
+                            onChange={(date) => setFormData(prev => ({ ...prev, date }))}
                             required
                         />
                     </div>

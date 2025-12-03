@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import { getLeaves, deleteLeave } from '@/lib/api/hr';
 import { Leave } from '@/lib/types/hr';
 
@@ -46,8 +47,8 @@ export default function LeavesPage() {
     const columns = [
         { key: 'id', label: 'شناسه' },
         { key: 'leave_type', label: 'نوع مرخصی' },
-        { key: 'start_date', label: 'تاریخ شروع' },
-        { key: 'end_date', label: 'تاریخ پایان' },
+        { key: 'start_date', label: 'تاریخ شروع', render: (value: string) => <JalaliDateDisplay date={value} /> },
+        { key: 'end_date', label: 'تاریخ پایان', render: (value: string) => <JalaliDateDisplay date={value} /> },
         { key: 'days', label: 'تعداد روز' },
         { key: 'status', label: 'وضعیت' }
     ];

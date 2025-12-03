@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 export default function PurchaseReceiptsPage() {
@@ -45,7 +46,7 @@ export default function PurchaseReceiptsPage() {
     const columns = [
         { key: 'id', label: 'شناسه' },
         { key: 'receipt_number', label: 'شماره رسید' },
-        { key: 'date', label: 'تاریخ' },
+        { key: 'date', label: 'تاریخ', render: (value: string) => <JalaliDateDisplay date={value} /> },
         { key: 'purchase_order', label: 'سفارش خرید', render: (value: any) => value ? `PO-${value}` : '-' },
     ];
 

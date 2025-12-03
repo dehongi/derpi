@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
+import JalaliDatePicker from '@/components/JalaliDatePicker';
 import { getSalesOrder, updateSalesOrder, deleteSalesOrder, getCustomers, getItems } from '@/lib/api/sales';
 import api from '@/utils/api';
 
@@ -227,24 +228,18 @@ export default function EditSalesOrderPage() {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">تاریخ</label>
-                        <input
-                            type="date"
-                            name="date"
+                        <JalaliDatePicker
+                            label="تاریخ"
                             value={formData.date}
-                            onChange={handleChange}
-                            className="w-full border rounded px-3 py-2"
+                            onChange={(date) => setFormData((prev: any) => ({ ...prev, date }))}
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">تاریخ تحویل</label>
-                        <input
-                            type="date"
-                            name="delivery_date"
+                        <JalaliDatePicker
+                            label="تاریخ تحویل"
                             value={formData.delivery_date || ''}
-                            onChange={handleChange}
-                            className="w-full border rounded px-3 py-2"
+                            onChange={(date) => setFormData((prev: any) => ({ ...prev, delivery_date: date }))}
                         />
                     </div>
                     <div>

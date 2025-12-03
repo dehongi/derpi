@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PageHeader from '@/components/PageHeader';
 import DataTable from '@/components/DataTable';
+import { JalaliDateDisplay } from '@/components/JalaliDatePicker';
 import api from '@/utils/api';
 
 export default function PurchaseReceiptDetailPage() {
@@ -136,7 +137,7 @@ export default function PurchaseReceiptDetailPage() {
                     </div>
                     <div>
                         <span className="block text-sm text-gray-500">تاریخ</span>
-                        <span className="font-medium">{receipt.date}</span>
+                        <span className="font-medium"><JalaliDateDisplay date={receipt.date} /></span>
                     </div>
                     <div>
                         <span className="block text-sm text-gray-500">یادداشت‌ها</span>
