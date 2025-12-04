@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function DashboardLayout({
     children,
@@ -8,6 +9,14 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { isAuthenticated, loading } = useAuth();
+
+    // Redirect to login if not authenticated
+    useEffect(() => {
+        if (!loading && !isAuthenticated) {
+            window.location.href = '/login';
+        }
+    }, [loading, isAuthenticated]);
 
     // Prevent body scroll when mobile sidebar is open
     useEffect(() => {
@@ -22,6 +31,24 @@ export default function DashboardLayout({
     }, [sidebarOpen]);
 
     const closeSidebar = () => setSidebarOpen(false);
+
+    // Show loading state while checking authentication
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">در حال بارگذاری...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Don't render dashboard if not authenticated (will redirect)
+    if (!isAuthenticated) {
+        return null;
+    }
+
 
     return (
         <div className="min-h-screen flex bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
